@@ -1,4 +1,3 @@
-//const { GraphQLServer } = require('graphql-yoga')
 import { GraphQLServer } from 'graphql-yoga';
 
 // 1
