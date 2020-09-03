@@ -2,18 +2,13 @@ import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
 export class User {
-
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-      length: 100
-  })
+  @Column({ length: 100 })
   fisrtName: string;
 
-  @Column({
-      length: 100
-  })
+  @Column({ length: 100 })
   lastName: string;
 
   @Column("integer")
@@ -21,5 +16,4 @@ export class User {
 
   @Column("float")
   weight: number;
-
 }
