@@ -10,10 +10,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "graphql-yoga": "1.18.3"
+    "graphql-yoga": "1.18.3",
+    "typeorm": "0.2.25",
+    "reflect-metadata": "0.1.13",
+    "pg": "8.3.3",
+    "es6": "0.0.7",
+    "es6-shim": "0.35.5"
   },
   "devDependencies": {
     "ts-node": "9.0.0",
-    "typescript": "4.0.2"
+    "typescript": "4.0.2",
+    "@types/node": "14.6.3",
+    "@types/es6-shim": "0.31.41"
   }
 }
