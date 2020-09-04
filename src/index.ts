@@ -67,13 +67,13 @@ const resolvers = {
       let userRepository = getConnection().getRepository(User);
 
       // Verificando se ha um usuario cujo email eh o email do parametro
-      let userRequired = await userRepository.findOne({ email: args.email });
+      let user = await userRepository.findOne({ email: args.email });
 
-      // Se sim, verifique se sua senha esta correta
-      if (userRequired.password == encryptedPassword) {
-        // Se estiver, retorna esse usuario com seu token
+      // Verificando se o usuario existe e, caso exista, se sua senha esta correta
+      if (user && user.password == encryptedPassword) {
+        // Se o usuario existir e sua senha estiver correta, retorna esse usuario com seu token
         return {
-          user: userRequired,
+          user,
           token: "the_token",
         }
       }
