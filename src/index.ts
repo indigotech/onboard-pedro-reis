@@ -65,28 +65,14 @@ const resolvers = {
 
   Mutation: {
     login: (parent, args) => {
-      const usuario = users[0]
-      const token = 'the_token'
+      const user: User = users[0]
+      const token: string = 'the_token'
       return {
-        usuario,
+        user,
         token,
       }
       }
-  },
-
-  User: {
-    id: (parent) => parent.id,
-    name: (parent) => parent.name,
-    email: (parent) => parent.email,
-    birthDate: (parent) => parent.birthDate,
-    cpf: (parent) => parent.cpf,
-  },
-
-  Login: {
-    user: () => users[0],
-    token: () => 'the_token',
   }
-
 }
 
 const server = new GraphQLServer({
