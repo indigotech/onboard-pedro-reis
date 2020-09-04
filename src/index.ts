@@ -61,7 +61,6 @@ const resolvers = {
 
       if (user && user.password == encryptedPassword) {
         const token = jwt.sign({username: user.name}, 'supersecret', {expiresIn: 120});
-        console.log(token);
         return {
           user,
           token,
