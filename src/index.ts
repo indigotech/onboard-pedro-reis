@@ -3,6 +3,7 @@ import "reflect-metadata";
 import {createConnection, getConnection} from "typeorm";
 import {User} from "./entity/User";
 import * as crypto from "crypto";
+import * as jwt from "jsonwebtoken"
 
 createConnection({
   type: "postgres",
@@ -59,9 +60,11 @@ const resolvers = {
       let user = await userRepository.findOne({ email: args.email });
 
       if (user && user.password == encryptedPassword) {
+        const token = jwt.sign({username: user.name}, 'supersecret', {expiresIn: 120});
+        console.log(token);
         return {
           user,
-          token: "the_token",
+          token,
         }
       }
       // O que fazer quando nao acha nenhum user?
