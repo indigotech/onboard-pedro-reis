@@ -7,6 +7,11 @@ import "reflect-metadata";
 import {createConnection} from "typeorm";
 import {User} from "./entity/User";
 
+  // Crypto
+import * as crypto from "crypto";
+
+let users;
+
 // Conexao com o banco de dados
 createConnection({
   type: "postgres",
@@ -20,9 +25,15 @@ createConnection({
   ],
   synchronize: true,
   logging: false
-}).then(connection => {
-  console.log("Database connected");
+}).then(async connection => {
   // here you can start to work with your entities
+  console.log("Database connected");
+
+  // Acessando o repositorio de usuarios
+  let userRepository = connection.getRepository(User);
+
+  users = await userRepository.find();
+
 }).catch(error => console.log(error));
 
 const typeDefs = `
@@ -41,6 +52,7 @@ type User {
   email: String!
   birthDate: String!
   cpf: String!
+  password: String!
 }
 
 type Login {
@@ -49,29 +61,29 @@ type Login {
 }
 `
 
-let users = [{
-  id: 12,
-  name: 'User aaa',
-  email: 'User e-mail',
-  birthDate: '04-25-1990',
-  cpf: 'XXXXXXXXXXX',
-}]
-
 const resolvers = {
   Query: {
     info: () => 'GraphQL Server',
-    feed: () => users,
+    feed: () => users[0],
   },
 
   Mutation: {
     login: (parent, args) => {
-      const user: User = users[0]
-      const token: string = 'the_token'
-      return {
-        user,
-        token,
+
+      const cipher = crypto.createCipher('aes128', 'a passoword');
+      var encrypted = cipher.update(args.password, 'utf8', 'hex');
+      encrypted += cipher.final('hex');
+
+      for (let i = 0; i < users.length; i++) {
+        if (args.email == users[i].email && encrypted == users[i].password) {
+          return {
+            user: users[i],
+            token: "the_token",
+          }
+        }
       }
-      }
+      // O que fazer quando nao acha nenhum user?
+    }
   }
 }
 
