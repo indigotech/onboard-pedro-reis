@@ -6,14 +6,15 @@ export class User {
   id: number;
 
   @Column({ length: 100 })
-  fisrtName: string;
+  name: string;
 
   @Column({ length: 100 })
-  lastName: string;
+  email: string;
 
-  @Column("integer")
-  age: number;
+  @Column({ length: 10 })
+  birthDate: string;
 
-  @Column("float")
-  weight: number;
+  @Column({ length: 11 })
+  cpf: string;
+
 }

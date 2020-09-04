@@ -1,5 +1,5 @@
 // Imports
-  // GraphQL (servidor)
+  // GraphQL
 import { GraphQLServer } from 'graphql-yoga';
 
   // TypeORM (banco de dados)
@@ -25,21 +25,70 @@ createConnection({
   // here you can start to work with your entities
 }).catch(error => console.log(error));
 
-// 1
 const typeDefs = `
 type Query {
   info: String!
+  feed: [User!]!
+}
+
+type Mutation {
+  login(email: String!, password: String!): Login!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  birthDate: String!
+  cpf: String!
+}
+
+type Login {
+  user: User!
+  token: String!
 }
 `
 
-// 2
+let users = [{
+  id: 12,
+  name: 'User aaa',
+  email: 'User e-mail',
+  birthDate: '04-25-1990',
+  cpf: 'XXXXXXXXXXX',
+}]
+
 const resolvers = {
   Query: {
-    info: () => 'GraphQL Server'
+    info: () => 'GraphQL Server',
+    feed: () => users,
+  },
+
+  Mutation: {
+    login: (parent, args) => {
+      const usuario = users[0]
+      const token = 'the_token'
+      return {
+        usuario,
+        token,
+      }
+      }
+  },
+
+  User: {
+    id: (parent) => parent.id,
+    name: (parent) => parent.name,
+    email: (parent) => parent.email,
+    birthDate: (parent) => parent.birthDate,
+    cpf: (parent) => parent.cpf,
+  },
+
+  Login: {
+    user: () => users[0],
+    token: () => 'the_token',
   }
+
 }
 
-// 3
 const server = new GraphQLServer({
   typeDefs,
   resolvers,
