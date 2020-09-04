@@ -1,13 +1,9 @@
-// Imports
-  // GraphQL
 import { GraphQLServer } from 'graphql-yoga';
-
-  // TypeORM (banco de dados)
 import "reflect-metadata";
-import {createConnection} from "typeorm";
+import {createConnection, getConnection} from "typeorm";
 import {User} from "./entity/User";
+import * as crypto from "crypto";
 
-// Conexao com o banco de dados
 createConnection({
   type: "postgres",
   host: "localhost",
@@ -22,13 +18,11 @@ createConnection({
   logging: false
 }).then(connection => {
   console.log("Database connected");
-  // here you can start to work with your entities
 }).catch(error => console.log(error));
 
 const typeDefs = `
 type Query {
   info: String!
-  feed: [User!]!
 }
 
 type Mutation {
@@ -41,6 +35,7 @@ type User {
   email: String!
   birthDate: String!
   cpf: String!
+  password: String!
 }
 
 type Login {
@@ -48,30 +43,29 @@ type Login {
   token: String!
 }
 `
-
-let users = [{
-  id: 12,
-  name: 'User aaa',
-  email: 'User e-mail',
-  birthDate: '04-25-1990',
-  cpf: 'XXXXXXXXXXX',
-}]
-
 const resolvers = {
   Query: {
     info: () => 'GraphQL Server',
-    feed: () => users,
   },
 
   Mutation: {
-    login: (parent, args) => {
-      const user: User = users[0]
-      const token: string = 'the_token'
-      return {
-        user,
-        token,
+    login: async (parent, args) => {
+
+      const cipher = crypto.createCipher('aes128', 'a passoword');
+      var encryptedPassword = cipher.update(args.password, 'utf8', 'hex');
+      encryptedPassword += cipher.final('hex');
+
+      let userRepository = getConnection().getRepository(User);
+      let user = await userRepository.findOne({ email: args.email });
+
+      if (user && user.password == encryptedPassword) {
+        return {
+          user,
+          token: "the_token",
+        }
       }
-      }
+      // O que fazer quando nao acha nenhum user?
+    }
   }
 }
 
