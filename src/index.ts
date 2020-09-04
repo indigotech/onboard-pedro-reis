@@ -4,13 +4,11 @@ import { GraphQLServer } from 'graphql-yoga';
 
   // TypeORM (banco de dados)
 import "reflect-metadata";
-import {createConnection} from "typeorm";
+import {createConnection, getConnection} from "typeorm";
 import {User} from "./entity/User";
 
   // Crypto
 import * as crypto from "crypto";
-
-let users;
 
 // Conexao com o banco de dados
 createConnection({
@@ -25,21 +23,13 @@ createConnection({
   ],
   synchronize: true,
   logging: false
-}).then(async connection => {
-  // here you can start to work with your entities
+}).then(connection => {
   console.log("Database connected");
-
-  // Acessando o repositorio de usuarios
-  let userRepository = connection.getRepository(User);
-
-  users = await userRepository.find();
-
 }).catch(error => console.log(error));
 
 const typeDefs = `
 type Query {
   info: String!
-  feed: [User!]!
 }
 
 type Mutation {
@@ -60,26 +50,31 @@ type Login {
   token: String!
 }
 `
-
 const resolvers = {
   Query: {
     info: () => 'GraphQL Server',
-    feed: () => users[0],
   },
 
   Mutation: {
-    login: (parent, args) => {
+    login: async (parent, args) => {
 
+      // Encriptando a senha passada como parametro
       const cipher = crypto.createCipher('aes128', 'a passoword');
-      var encrypted = cipher.update(args.password, 'utf8', 'hex');
-      encrypted += cipher.final('hex');
+      var encryptedPassword = cipher.update(args.password, 'utf8', 'hex');
+      encryptedPassword += cipher.final('hex');
 
-      for (let i = 0; i < users.length; i++) {
-        if (args.email == users[i].email && encrypted == users[i].password) {
-          return {
-            user: users[i],
-            token: "the_token",
-          }
+      // Acessando o repositorio de usuarios
+      let userRepository = getConnection().getRepository(User);
+
+      // Verificando se ha um usuario cujo email eh o email do parametro
+      let userRequired = await userRepository.findOne({ email: args.email });
+
+      // Se sim, verifique se sua senha esta correta
+      if (userRequired.password == encryptedPassword) {
+        // Se estiver, retorna esse usuario com seu token
+        return {
+          user: userRequired,
+          token: "the_token",
         }
       }
       // O que fazer quando nao acha nenhum user?
