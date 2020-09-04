@@ -1,16 +1,9 @@
-// Imports
-  // GraphQL
 import { GraphQLServer } from 'graphql-yoga';
-
-  // TypeORM (banco de dados)
 import "reflect-metadata";
 import {createConnection, getConnection} from "typeorm";
 import {User} from "./entity/User";
-
-  // Crypto
 import * as crypto from "crypto";
 
-// Conexao com o banco de dados
 createConnection({
   type: "postgres",
   host: "localhost",
@@ -58,20 +51,14 @@ const resolvers = {
   Mutation: {
     login: async (parent, args) => {
 
-      // Encriptando a senha passada como parametro
       const cipher = crypto.createCipher('aes128', 'a passoword');
       var encryptedPassword = cipher.update(args.password, 'utf8', 'hex');
       encryptedPassword += cipher.final('hex');
 
-      // Acessando o repositorio de usuarios
       let userRepository = getConnection().getRepository(User);
-
-      // Verificando se ha um usuario cujo email eh o email do parametro
       let user = await userRepository.findOne({ email: args.email });
 
-      // Verificando se o usuario existe e, caso exista, se sua senha esta correta
       if (user && user.password == encryptedPassword) {
-        // Se o usuario existir e sua senha estiver correta, retorna esse usuario com seu token
         return {
           user,
           token: "the_token",
