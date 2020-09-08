@@ -1,27 +1,16 @@
-import { GraphQLServer } from 'graphql-yoga';
 import "reflect-metadata";
-import {createConnection, getConnection} from "typeorm";
+import {getConnection} from "typeorm";
 import {User} from "./entity/User";
 import * as crypto from "crypto";
-import * as jwt from "jsonwebtoken"
+import * as jwt from "jsonwebtoken";
+import * as dotenv from 'dotenv';
+import { setup } from './setup';
 
-createConnection({
-  type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "localdb_user",
-  password: "localdb_password",
-  database: "localdb_name",
-  entities: [
-    User
-  ],
-  synchronize: true,
-  logging: false
-}).then(connection => {
-  console.log("Database connected");
-}).catch(error => console.log(error));
+const isTest: boolean = process.env.TEST == 'true';
 
-const typeDefs = `
+dotenv.config({path: process.cwd() + (isTest ? '/test.env': '/.env') });
+
+export const typeDefs = `
 type Query {
   info: String!
 }
@@ -44,7 +33,7 @@ type Login {
   token: String!
 }
 `
-const resolvers = {
+export const resolvers = {
   Query: {
     info: () => 'GraphQL Server',
   },
@@ -71,8 +60,4 @@ const resolvers = {
   }
 }
 
-const server = new GraphQLServer({
-  typeDefs,
-  resolvers,
-})
-server.start(() => console.log('Server is running on http://localhost:4000'))
+setup();
