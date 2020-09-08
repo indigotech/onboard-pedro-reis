@@ -60,7 +60,6 @@ const resolvers = {
       let user = await userRepository.findOne({ email: args.email });
 
       if (user && user.password == encryptedPassword) {
-        console.log(args.rememberMe);
         const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? "1h": "7d"});
         return {
           user,
