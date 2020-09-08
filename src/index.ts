@@ -27,7 +27,7 @@ type Query {
 }
 
 type Mutation {
-  login(email: String!, password: String!): Login!
+  login(email: String!, password: String!, rememberMe: Boolean): Login!
 }
 
 type User {
@@ -60,7 +60,7 @@ const resolvers = {
       let user = await userRepository.findOne({ email: args.email });
 
       if (user && user.password == encryptedPassword) {
-        const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: "1h"});
+        const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? "7d": "1h"});
         return {
           user,
           token,

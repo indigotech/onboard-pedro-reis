@@ -14,7 +14,6 @@
     "typeorm": "0.2.25",
     "reflect-metadata": "0.1.13",
     "pg": "8.3.3",
-    "crypto": "1.0.1",
     "jsonwebtoken": "8.5.1"
   },
   "devDependencies": {
