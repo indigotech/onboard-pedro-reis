@@ -58,8 +58,4 @@ describe('Loading server and Database', function () {
       expect(res.body.data.login.user.birthDate).to.be.eq('28-08-1987');
     })
   })
-
-
-
-
 })
