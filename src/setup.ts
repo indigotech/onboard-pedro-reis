@@ -2,7 +2,8 @@ import { GraphQLServer } from "graphql-yoga";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { User } from "./entity/User";
-import { typeDefs, resolvers } from './schema';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
 import * as dotenv from 'dotenv';
 
 export async function setup() {
