@@ -1,9 +1,15 @@
 import { GraphQLServer } from "graphql-yoga";
+import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { User } from "./entity/User";
-import { typeDefs, resolvers } from './index';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
+import * as dotenv from 'dotenv';
 
 export async function setup() {
+  const isTest: boolean = process.env.TEST == 'true';
+  dotenv.config({path: process.cwd() + (isTest ? '/test.env': '/.env') });
+
   await connectToDatabase();
   await startServer();
 }
