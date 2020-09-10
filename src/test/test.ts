@@ -10,13 +10,13 @@ describe('Tests', function () {
 
   it('should print GraphQL Server', async function() {
     const res = await request("http://localhost:4001")
-      .post('/')
-      .set('Accept', 'application/json')
-      .send({
-        query: 'query { info }'
-      })
-      .expect(200)
-      .expect('Content-Type', /json/)
-      expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
+    .post('/')
+    .set('Accept', 'application/json')
+    .send({
+      query: 'query { info }'
+    })
+    .expect(200)
+    .expect('Content-Type', /json/)
+    expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
   })
 })
