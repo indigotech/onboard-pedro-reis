@@ -31,10 +31,8 @@ describe('Loading server and Database', function () {
 
     after (async function() {
       let userRepository = getConnection().getRepository(User);
-      let allUsers = await userRepository.find();
-      await userRepository.remove(allUsers);
+      await userRepository.clear();
       console.log('All users removed');
-      // Ha algum jeito melhor de se fazer, sem carregar todos os usuarios???
     })
     it('Hello Test', async function() {
       const res = await request("http://localhost:4001")
