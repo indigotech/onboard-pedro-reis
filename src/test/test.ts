@@ -6,6 +6,8 @@ import { User } from "../entity/User";
 import { getConnection } from "typeorm";
 import * as crypto from "crypto";
 
+const url: string = 'http://localhost';
+
 describe('Loading server and Database', function () {
   before(async function() {
     await setup();
@@ -35,7 +37,7 @@ describe('Loading server and Database', function () {
       console.log('All users removed');
     })
     it('Hello Test', async function() {
-      const res = await request("http://localhost:4001")
+      const res = await request(url + ':' + process.env.PORT)
         .post('/')
         .set('Accept', 'application/json')
         .send({
@@ -47,7 +49,7 @@ describe('Loading server and Database', function () {
     })
 
     it('should find a User', async function() {
-      const res = await request('http://localhost:4001')
+      const res = await request(url + ':' + process.env.PORT)
         .post('/')
         .send({
           query: 'mutation { login( email: "joao.silva@gmail.com" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf } token } }'
