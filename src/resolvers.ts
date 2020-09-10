@@ -5,7 +5,7 @@ import { User } from "./entity/User";
 
 export const resolvers = {
   Query: {
-    info: () => 'GraphQL Server',
+    info: () => 'Hello, Taqtiler!',
   },
 
   Mutation: {
