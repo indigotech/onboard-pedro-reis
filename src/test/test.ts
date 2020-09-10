@@ -38,22 +38,22 @@ describe('Loading server and Database', function () {
     })
     it('Hello Test', async function() {
       const res = await request(url + ':' + process.env.PORT)
-        .post('/')
-        .set('Accept', 'application/json')
-        .send({
-          query: 'query { info }'
-        })
-        .expect(200)
-        .expect('Content-Type', /json/)
-        expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
+      .post('/')
+      .set('Accept', 'application/json')
+      .send({
+        query: 'query { info }'
+      })
+      .expect(200)
+      .expect('Content-Type', /json/)
+      expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
     })
 
     it('should find a User', async function() {
       const res = await request(url + ':' + process.env.PORT)
-        .post('/')
-        .send({
-          query: 'mutation { login( email: "joao.silva@gmail.com" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf } token } }'
-        })
+      .post('/')
+      .send({
+        query: 'mutation { login( email: "joao.silva@gmail.com" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf } token } }'
+      })
       expect(res.body.data.login.user.name).to.be.eq('Joao da Silva');
       expect(res.body.data.login.user.birthDate).to.be.eq('28-08-1987');
     })
