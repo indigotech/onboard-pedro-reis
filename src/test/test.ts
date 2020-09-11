@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { expect } from "chai";
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
-import { hashEncrypt, hashDecrypt } from '../functions/functions'
+import { hashEncrypt } from '../functions/functions'
 
 const url: string = 'http://localhost';
 
@@ -22,11 +22,11 @@ describe('Hello', function() {
   })
 })
 
+const user = new User();
 describe('Mutation Login Test', function() {
   before(async function() {
     const userRepository = getRepository(User);
 
-    const user = new User();
     user.name = 'Joao da Silva';
     user.email = 'joao.silva@gmail.com';
     user.birthDate = '28-08-1987';
@@ -34,6 +34,9 @@ describe('Mutation Login Test', function() {
     user.password = hashEncrypt('joaosilvap');
 
     await userRepository.save(user);
+    user.password = 'joaosilvap';
+    // Achei meio feia essa solucao, porque na hora de salvar no banco, temos que encriptar, mas para
+    //usar como parametro na mutation, ele vai crua mesmo...
   })
 
   after (async function() {
@@ -45,20 +48,71 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { login( email: "joao.silva@gmail.com" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf password } token } }'
+      query: 'mutation { \
+                login( \
+                  email: "' + user.email + '" \
+                  password: "' + user.password + '" \
+                  rememberMe: true \
+                ) { \
+                  user \
+                  { \
+                    id \
+                    name \
+                    email \
+                    birthDate \
+                    cpf \
+                    password \
+                  } \
+                  token \
+                } \
+              }'
     })
-    expect(res.body.data.login.user.name).to.be.eq('Joao da Silva');
-    expect(res.body.data.login.user.email).to.be.eq('joao.silva@gmail.com');
-    expect(res.body.data.login.user.birthDate).to.be.eq('28-08-1987');
-    expect(res.body.data.login.user.cpf).to.be.eq('XXXXXXXXXXX');
-    expect(hashDecrypt(res.body.data.login.user.password)).to.be.eq('joaosilvap');
+    console.log('mutation { \
+      login( \
+        email: "' + user.email + '" \
+        password: "' + user.password + '" \
+        rememberMe: true \
+      ) { \
+        user \
+        { \
+          id \
+          name \
+          email \
+          birthDate \
+          cpf \
+          password \
+        } \
+        token \
+      } \
+    }');
+    expect(res.body.data.login.user.name).to.be.eq(user.name);
+    expect(res.body.data.login.user.email).to.be.eq(user.email);
+    expect(res.body.data.login.user.birthDate).to.be.eq(user.birthDate);
+    expect(res.body.data.login.user.cpf).to.be.eq(user.cpf);
   })
 
   it('should return wrong email format error', async function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { login( email: "joao.silvagmail.com" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf password } token } }'
+      query: 'mutation { \
+        login( \
+          email: "joao.silvahotmail.com" \
+          password: "' + user.password + '" \
+          rememberMe: true \
+        ) { \
+          user \
+          { \
+            id \
+            name \
+            email \
+            birthDate \
+            cpf \
+            password \
+          } \
+          token \
+        } \
+      }'
     })
     expect(res.body.errors[0].message).to.be.eq('Formato de e-mail incorreto!');
     expect(res.body.errors[0].code).to.be.eq(401);
@@ -68,7 +122,24 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { login( email: "joao.silva@gmail.co" password: "joaosilvap" rememberMe: true ) { user { id name email birthDate cpf password } token } }'
+      query: 'mutation { \
+        login( \
+          email: "jose.silva@hotmail.com" \
+          password: "' + user.password + '" \
+          rememberMe: true \
+        ) { \
+          user \
+          { \
+            id \
+            name \
+            email \
+            birthDate \
+            cpf \
+            password \
+          } \
+          token \
+        } \
+      }'
     })
     expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
     expect(res.body.errors[0].code).to.be.eq(401);
@@ -78,9 +149,26 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { login( email: "joao.silva@gmail.com" password: "joaosilva" rememberMe: true ) { user { id name email birthDate cpf password } token } }'
+      query: 'mutation { \
+        login( \
+          email: "' + user.email + '" \
+          password: "senha_incorreta" \
+          rememberMe: true \
+        ) { \
+          user \
+          { \
+            id \
+            name \
+            email \
+            birthDate \
+            cpf \
+            password \
+          } \
+          token \
+        } \
+      }'
     })
-    expect(res.body.errors[0].message).to.be.eq('Senha incorreta!');
+    expect(res.body.errors[0].message).to.be.eq('Email e/ou senha incorretos!');
     expect(res.body.errors[0].code).to.be.eq(401);
   })
 })

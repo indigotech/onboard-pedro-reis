@@ -24,7 +24,7 @@ export const resolvers = {
 
       const encryptedPassword = hashEncrypt(args.password);
       if (user.password != encryptedPassword) {
-        throw new CustomError('Senha incorreta!', 401, 'Unauthorized');
+        throw new CustomError('Email e/ou senha incorretos!', 401, 'Unauthorized');
       }
 
       const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? '7d': '1h'});
