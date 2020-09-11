@@ -22,8 +22,10 @@ describe('Hello', function() {
   })
 })
 
-const user = new User();
 describe('Mutation Login Test', function() {
+  const user = new User();
+  const defaultPassword = 'joaosilvap';;
+
   before(async function() {
     const userRepository = getRepository(User);
 
@@ -31,12 +33,9 @@ describe('Mutation Login Test', function() {
     user.email = 'joao.silva@gmail.com';
     user.birthDate = '28-08-1987';
     user.cpf = 'XXXXXXXXXXX';
-    user.password = hashEncrypt('joaosilvap');
+    user.password = hashEncrypt(defaultPassword);
 
     await userRepository.save(user);
-    user.password = 'joaosilvap';
-    // Achei meio feia essa solucao, porque na hora de salvar no banco, temos que encriptar, mas para
-    //usar como parametro na mutation, ele vai crua mesmo...
   })
 
   after (async function() {
@@ -48,7 +47,7 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: loginMutationString(user.email, user.password)
+      query: loginMutationString(user.email, defaultPassword)
     })
     expect(res.body.data.login.user.name).to.be.eq(user.name);
     expect(res.body.data.login.user.email).to.be.eq(user.email);
@@ -60,7 +59,7 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: loginMutationString('joao.silvagmail.com', user.password)
+      query: loginMutationString('joao.silvagmail.com', defaultPassword)
     })
     expect(res.body.errors[0].message).to.be.eq('Formato de e-mail incorreto!');
     expect(res.body.errors[0].code).to.be.eq(401);
@@ -70,7 +69,7 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: loginMutationString('jose.silva@gmail.com', user.password)
+      query: loginMutationString('jose.silva@gmail.com', defaultPassword)
     })
     expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
     expect(res.body.errors[0].code).to.be.eq(401);

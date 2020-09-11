@@ -24,7 +24,6 @@ async function connectToDatabase() {
     synchronize: true,
     logging: false
   });
-  console.log( (process.env.TEST ? 'Test' : 'Local') + ' Database connected');
 }
 
 async function startServer() {
@@ -34,5 +33,4 @@ async function startServer() {
   });
 
   await server.start({ formatError, debug: false, port: process.env.PORT });
-  console.log('Server is running on http://localhost:' + process.env.PORT);
 }
