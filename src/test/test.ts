@@ -48,43 +48,25 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { \
-                login( \
-                  email: "' + user.email + '" \
-                  password: "' + user.password + '" \
-                  rememberMe: true \
-                ) { \
-                  user \
-                  { \
-                    id \
-                    name \
-                    email \
-                    birthDate \
-                    cpf \
-                    password \
-                  } \
-                  token \
-                } \
-              }'
+      query: `mutation {
+                login(
+                  email: "${user.email}"
+                  password: "${user.password}"
+                  rememberMe: true
+                ) {
+                  user
+                  {
+                    id
+                    name
+                    email
+                    birthDate
+                    cpf
+                    password
+                  }
+                  token
+                }
+              }`
     })
-    console.log('mutation { \
-      login( \
-        email: "' + user.email + '" \
-        password: "' + user.password + '" \
-        rememberMe: true \
-      ) { \
-        user \
-        { \
-          id \
-          name \
-          email \
-          birthDate \
-          cpf \
-          password \
-        } \
-        token \
-      } \
-    }');
     expect(res.body.data.login.user.name).to.be.eq(user.name);
     expect(res.body.data.login.user.email).to.be.eq(user.email);
     expect(res.body.data.login.user.birthDate).to.be.eq(user.birthDate);
@@ -95,24 +77,24 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { \
-        login( \
-          email: "joao.silvahotmail.com" \
-          password: "' + user.password + '" \
-          rememberMe: true \
-        ) { \
-          user \
-          { \
-            id \
-            name \
-            email \
-            birthDate \
-            cpf \
-            password \
-          } \
-          token \
-        } \
-      }'
+      query: `mutation {
+        login(
+          email: "joao.silvahotmail.com"
+          password: "${user.password}"
+          rememberMe: true
+        ) {
+          user
+          {
+            id
+            name
+            email
+            birthDate
+            cpf
+            password
+          }
+          token
+        }
+      }`
     })
     expect(res.body.errors[0].message).to.be.eq('Formato de e-mail incorreto!');
     expect(res.body.errors[0].code).to.be.eq(401);
@@ -122,24 +104,24 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { \
-        login( \
-          email: "jose.silva@hotmail.com" \
-          password: "' + user.password + '" \
-          rememberMe: true \
-        ) { \
-          user \
-          { \
-            id \
-            name \
-            email \
-            birthDate \
-            cpf \
-            password \
-          } \
-          token \
-        } \
-      }'
+      query: `mutation {
+        login(
+          email: "jose.silva@hotmail.com"
+          password: "${user.password}"
+          rememberMe: true
+        ) {
+          user
+          {
+            id
+            name
+            email
+            birthDate
+            cpf
+            password
+          }
+          token
+        }
+      }`
     })
     expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
     expect(res.body.errors[0].code).to.be.eq(401);
@@ -149,24 +131,24 @@ describe('Mutation Login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
     .post('/')
     .send({
-      query: 'mutation { \
-        login( \
-          email: "' + user.email + '" \
-          password: "senha_incorreta" \
-          rememberMe: true \
-        ) { \
-          user \
-          { \
-            id \
-            name \
-            email \
-            birthDate \
-            cpf \
-            password \
-          } \
-          token \
-        } \
-      }'
+      query: `mutation {
+        login(
+          email: "${user.email}"
+          password: "senha_incorreta"
+          rememberMe: true
+        ) {
+          user
+          {
+            id
+            name
+            email
+            birthDate
+            cpf
+            password
+          }
+          token
+        }
+      }`
     })
     expect(res.body.errors[0].message).to.be.eq('Email e/ou senha incorretos!');
     expect(res.body.errors[0].code).to.be.eq(401);
