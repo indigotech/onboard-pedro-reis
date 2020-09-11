@@ -1,7 +1,8 @@
-import * as crypto from "crypto";
-import * as jwt from "jsonwebtoken";
-import { getConnection } from "typeorm";
-import { User } from "./entity/User";
+import * as jwt from 'jsonwebtoken';
+import { getConnection } from 'typeorm';
+import { User } from './entity/User';
+import { CustomError } from './errors';
+import { hashEncrypt } from './functions/functions';
 
 export const resolvers = {
   Query: {
@@ -10,22 +11,27 @@ export const resolvers = {
 
   Mutation: {
     login: async (parent, args) => {
-
-      const cipher = crypto.createCipher('aes128', 'a passoword');
-      let encryptedPassword = cipher.update(args.password, 'utf8', 'hex');
-      encryptedPassword += cipher.final('hex');
+      const regExEmail = /\S+@\S+\.\S+/;
+      if (!regExEmail.test(args.email)) {
+        throw new CustomError('Formato de e-mail incorreto!', 401, 'Unauthorized');
+      }
 
       let userRepository = getConnection().getRepository(User);
       let user = await userRepository.findOne({ email: args.email });
-
-      if (user && user.password == encryptedPassword) {
-        const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? "7d": "1h"});
-        return {
-          user,
-          token,
-        }
+      if (!user) {
+        throw new CustomError('Usuário não encontrado!', 401, 'Unauthorized');
       }
-      // O que fazer quando nao acha nenhum user?
+
+      const encryptedPassword = hashEncrypt(args.password);
+      if (user.password != encryptedPassword) {
+        throw new CustomError('Senha incorreta!', 401, 'Unauthorized');
+      }
+
+      const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? '7d': '1h'});
+      return {
+        user,
+        token,
+      }
     }
   }
 }
