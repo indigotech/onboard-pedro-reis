@@ -22,7 +22,6 @@ type User {
   email: String!
   birthDate: String!
   cpf: String!
-  password: String!
 }
 
 type Login {

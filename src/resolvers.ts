@@ -76,7 +76,6 @@ export const resolvers = {
         email: user.email,
         birthDate: user.birthDate,
         cpf: user.cpf,
-        password: user.password
       };
     }
   }

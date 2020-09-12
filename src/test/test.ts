@@ -86,38 +86,6 @@ describe('Mutation login Test', function() {
   })
 })
 
-describe('Mutation createUser Test', function() {
-  const user = new User();
-  const defaultPassword = 'joaosilvap1';;
-
-  before(async function() {
-    const userRepository = getRepository(User);
-
-    user.name = 'Joao da Silva';
-    user.email = 'joao.silva@gmail.com';
-    user.birthDate = '28-08-1987';
-    user.cpf = 'XXXXXXXXXXX';
-    user.password = hashEncrypt(defaultPassword);
-
-    await userRepository.save(user);
-  })
-
-  after (async function() {
-    const userRepository = getRepository(User);
-    await userRepository.clear();
-  })
-
-  it('should create an new user', async function() {
-    const res = await request(url + ':' + process.env.PORT)
-    .post('/')
-    .send({
-      query: loginMutationString('jose.silva@gmail.com', defaultPassword)
-    })
-    expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
-    expect(res.body.errors[0].code).to.be.eq(401);
-  })
-})
-
 function loginMutationString(email: string, password: string): string {
   const mutation: string = `
   mutation {
@@ -133,7 +101,6 @@ function loginMutationString(email: string, password: string): string {
         email
         birthDate
         cpf
-        password
       }
       token
     }
@@ -141,49 +108,58 @@ function loginMutationString(email: string, password: string): string {
   return mutation;
 }
 
-function createUserMutationString(name: string, email: string, birthDate: string, cpf: string, password: string): string {
-  const mutation: string = `
-  mutation {
-    createUser (
-      user: {
-        name: "${name}",
-        email: "${email}",
-        birthDate: "${birthDate}",
-        cpf: "${cpf}",
-        password: "${password}"
-      }
-    )
-    {
-      id
-      name
-      email
-      birthDate
-      cpf
-      password
-    }
-  }`
-  return mutation;
-}
+// describe('Mutation createUser Test', function() {
+//   const user = new User();
+//   const defaultPassword = 'joaosilvap1';;
 
+//   before(async function() {
+//     const userRepository = getRepository(User);
 
+//     user.name = 'Joao da Silva';
+//     user.email = 'joao.silva@gmail.com';
+//     user.birthDate = '28-08-1987';
+//     user.cpf = 'XXXXXXXXXXX';
+//     user.password = hashEncrypt(defaultPassword);
 
+//     await userRepository.save(user);
+//   })
 
+//   after (async function() {
+//     const userRepository = getRepository(User);
+//     await userRepository.clear();
+//   })
 
-
-// const createUser = (token: string, user: CreateUserInput) => {
-//   const newUser = { ...user };
-
-//   return request.post('/')
-//     .auth(token, { type: 'bearer' })
+//   it('should create an new user', async function() {
+//     const res = await request(url + ':' + process.env.PORT)
+//     .post('/')
 //     .send({
-//       query: `mutation createUser($user: UserInput!) { createUser(user: $user) { id name email birthDate cpf } }`,
-//       variables: { user: newUser }
-//     });
-// };
-// Gabriel Moreira Minossi20:29
-// it('Fails to create a new user with an already registered email', async () => {
-//   const createUserResponse = await createUser(token, existingUser as CreateUserInput);
+//       query: loginMutationString('jose.silva@gmail.com', defaultPassword)
+//     })
+//     expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
+//     expect(res.body.errors[0].code).to.be.eq(401);
+//   })
+// })
 
-//   expect(createUserResponse.body).to.have.property('errors');
-//   expect(createUserResponse.body.errors[0].code).to.equal(400);
-// });
+// function createUserMutationString(name: string, email: string, birthDate: string, cpf: string, password: string): string {
+//   const mutation: string = `
+//   mutation {
+//     createUser (
+//       user: {
+//         name: "${name}",
+//         email: "${email}",
+//         birthDate: "${birthDate}",
+//         cpf: "${cpf}",
+//         password: "${password}"
+//       }
+//     )
+//     {
+//       id
+//       name
+//       email
+//       birthDate
+//       cpf
+//       password
+//     }
+//   }`
+//   return mutation;
+// }
