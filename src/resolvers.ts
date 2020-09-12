@@ -2,11 +2,30 @@ import * as jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
 import { User } from './entity/User';
 import { CustomError } from './errors';
-import { hashEncrypt } from './functions/functions';
+import { hashEncrypt, verifyToken } from './functions';
 
 export const resolvers = {
   Query: {
     info: () => 'Hello, Taqtiler!',
+
+    user: async (parent, args, context) => {
+      verifyToken(context.request.headers.authorization);
+
+      const userRepository = getRepository(User);
+      const user = await userRepository.findOne({ id: args.id });
+
+      if (!user) {
+        throw new CustomError('Usuário não encontrado!', 404, 'user id not found')
+      }
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        birthDate: user.birthDate,
+        cpf: user.cpf
+      }
+    }
   },
 
   Mutation: {
@@ -35,17 +54,7 @@ export const resolvers = {
     },
 
     createUser : async (parent, args, context) => {
-      const token = context.request.headers.authorization;
-      let decodedToken;
-
-      try {
-        decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-        if (!decodedToken.id){
-          throw new Error;
-        }
-      } catch(err) {
-        throw new CustomError('Usuário não autenticado! Faça seu login!', 401, 'invalid token');
-      }
+      verifyToken(context.request.headers.authorization);
 
       const userRepository = getRepository(User);
       let user = await userRepository.findOne({ email: args.user.email });

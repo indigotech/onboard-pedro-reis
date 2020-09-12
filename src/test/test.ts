@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { expect } from "chai";
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
-import { hashEncrypt } from '../functions/functions'
+import { hashEncrypt } from '../functions'
 
 const url: string = 'http://localhost';
 
