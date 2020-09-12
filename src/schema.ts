@@ -5,6 +5,15 @@ type Query {
 
 type Mutation {
   login(email: String!, password: String!, rememberMe: Boolean): Login!
+  createUser(user: CreateUserInput!): User!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  birthDate: String!
+  cpf: String!
+  password: String!
 }
 
 type User {
