@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { User } from './entity/User';
 import { CustomError } from './errors';
 import { hashEncrypt, verifyToken } from './functions';
@@ -24,6 +24,46 @@ export const resolvers = {
         email: user.email,
         birthDate: user.birthDate,
         cpf: user.cpf
+      }
+    },
+
+    users: async (parent, args, context) => {
+      verifyToken(context.request.headers.authorization);
+      let quantity = 5;
+      if (args.quantity) {
+        quantity = args.quantity;
+      }
+
+      let skip = 0;
+      if (args.skip) {
+        skip = args.skip;
+      }
+
+      let before: boolean = true;
+      if (skip == 0) {
+        before = false;
+      }
+
+      const userRepository = getRepository(User);
+
+      const userCount = await userRepository.count();
+      let after: boolean = false;
+      if (userCount > quantity + skip) {
+        after = true;
+      }
+
+      const users = await getConnection()
+      .getRepository(User)
+      .createQueryBuilder("user")
+      .orderBy("user.name", "DESC")
+      .take(quantity)
+      .skip(skip)
+      .getMany();
+
+      return {
+        users,
+        before,
+        after
       }
     }
   },

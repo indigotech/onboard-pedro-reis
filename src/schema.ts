@@ -2,6 +2,7 @@ export const typeDefs = `
 type Query {
   info: String!
   user(id: ID!): User!
+  users(quantity: Int, skip: Int): UserPagination!
 }
 
 type Mutation {
@@ -23,6 +24,12 @@ type User {
   email: String!
   birthDate: String!
   cpf: String!
+}
+
+type UserPagination {
+  users: [User!]!
+  before: Boolean!
+  after: Boolean!
 }
 
 type Login {
