@@ -30,6 +30,7 @@ async function startServer() {
   const server = new GraphQLServer({
     typeDefs,
     resolvers,
+    context: request => request,
   });
 
   await server.start({ formatError, debug: false, port: process.env.PORT });

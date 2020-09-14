@@ -22,9 +22,9 @@ describe('Hello', function() {
   })
 })
 
-describe('Mutation Login Test', function() {
+describe('Mutation login Test', function() {
   const user = new User();
-  const defaultPassword = 'joaosilvap';;
+  const defaultPassword = 'joaosilvap1';;
 
   before(async function() {
     const userRepository = getRepository(User);
@@ -101,10 +101,65 @@ function loginMutationString(email: string, password: string): string {
         email
         birthDate
         cpf
-        password
       }
       token
     }
   }`
   return mutation;
 }
+
+// describe('Mutation createUser Test', function() {
+//   const user = new User();
+//   const defaultPassword = 'joaosilvap1';;
+
+//   before(async function() {
+//     const userRepository = getRepository(User);
+
+//     user.name = 'Joao da Silva';
+//     user.email = 'joao.silva@gmail.com';
+//     user.birthDate = '28-08-1987';
+//     user.cpf = 'XXXXXXXXXXX';
+//     user.password = hashEncrypt(defaultPassword);
+
+//     await userRepository.save(user);
+//   })
+
+//   after (async function() {
+//     const userRepository = getRepository(User);
+//     await userRepository.clear();
+//   })
+
+//   it('should create an new user', async function() {
+//     const res = await request(url + ':' + process.env.PORT)
+//     .post('/')
+//     .send({
+//       query: loginMutationString('jose.silva@gmail.com', defaultPassword)
+//     })
+//     expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
+//     expect(res.body.errors[0].code).to.be.eq(401);
+//   })
+// })
+
+// function createUserMutationString(name: string, email: string, birthDate: string, cpf: string, password: string): string {
+//   const mutation: string = `
+//   mutation {
+//     createUser (
+//       user: {
+//         name: "${name}",
+//         email: "${email}",
+//         birthDate: "${birthDate}",
+//         cpf: "${cpf}",
+//         password: "${password}"
+//       }
+//     )
+//     {
+//       id
+//       name
+//       email
+//       birthDate
+//       cpf
+//       password
+//     }
+//   }`
+//   return mutation;
+// }
