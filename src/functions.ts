@@ -8,8 +8,8 @@ export function hashEncrypt (noEncrypted: string): string {
 
 export function verifyToken(token: string) {
   try {
-    let tokenValidation = jwt.verify(token, 'supersecret');
-    if (!tokenValidation.id){
+    const decodedToken = jwt.verify(token, 'supersecret');
+    if (!decodedToken.id){
       throw new Error;
     }
   } catch(err) {
