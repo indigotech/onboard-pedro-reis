@@ -1,4 +1,3 @@
-import { createSecureServer } from 'http2';
 import * as jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
 import { User } from './entity/User';
@@ -14,7 +13,7 @@ export const resolvers = {
     login: async (parent, args, context) => {
       const regExEmail = /\S+@\S+\.\S+/;
       if (!regExEmail.test(args.email)) {
-        throw new CustomError('Formato de e-mail incorreto!', 401, 'Unauthorized');
+        throw new CustomError('Formato de e-mail incorreto!', 40, 'Bad Request');
       }
 
       const userRepository = getRepository(User);
@@ -28,7 +27,7 @@ export const resolvers = {
         throw new CustomError('Email e/ou senha incorretos!', 401, 'Unauthorized');
       }
 
-      const token = jwt.sign({id: user.id}, 'supersecret', {expiresIn: args.remeberMe ? '7d': '1h'});
+      const token = jwt.sign({id: user.id}, process.env.TOKEN_SECRET, {expiresIn: args.remeberMe ? '7d': '1h'});
       return {
         user,
         token,
@@ -37,11 +36,11 @@ export const resolvers = {
 
     createUser : async (parent, args, context) => {
       const token = context.request.headers.authorization;
-      let tokenValidation;
+      let decodedToken;
 
       try {
-        tokenValidation = jwt.verify(token, 'supersecret');
-        if (!tokenValidation.id){
+        decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+        if (!decodedToken.id){
           throw new Error;
         }
       } catch(err) {
@@ -51,12 +50,12 @@ export const resolvers = {
       const userRepository = getRepository(User);
       let user = await userRepository.findOne({ email: args.user.email });
       if (user) {
-        throw new CustomError('Usuário já está cadastrado!', 401, 'email already registered');
+        throw new CustomError('Usuário já está cadastrado!', 403, 'email already registered');
       }
 
       const regExPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$/
       if (!regExPassword.test(args.user.password)){
-        throw new CustomError('Senha fraca!', 401, 'weak password');
+        throw new CustomError('Senha fraca!', 400, 'weak password');
       }
 
       user = new User();
@@ -66,9 +65,7 @@ export const resolvers = {
       user.cpf = args.user.cpf;
       user.password = hashEncrypt(args.user.password);
 
-      await userRepository.save(user);
-
-      user = await userRepository.findOne({ email: args.user.email });
+      user = await userRepository.save(user);
 
       return {
         id: user.id,
