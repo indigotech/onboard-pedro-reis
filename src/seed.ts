@@ -11,7 +11,7 @@ async function populateDataBase() {
   let userRepository = getRepository(User);
   let users = [];
 
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 50; i++) {
     const user = new User();
     user.name = faker.name.findName();
     user.email = faker.internet.email();

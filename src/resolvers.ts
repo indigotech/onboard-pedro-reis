@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { getConnection, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { User } from './entity/User';
 import { CustomError } from './errors';
 import { hashEncrypt, verifyToken } from './functions';
@@ -31,14 +31,15 @@ export const resolvers = {
       verifyToken(context.request.headers.authorization);
 
       const quantity = args.quantity ?? 5;
-
       const skip = args.skip ?? 0;
-
-      const before = !(skip === 0);
+      if (quantity < 0 || skip < 0) {
+        throw new CustomError('A quantidade e o offset devem ser positivos', 400, 'bad request');
+      }
 
       const userRepository = getRepository(User);
-
       const userCount = await userRepository.count();
+
+      const before = skip !== 0;
       const after = userCount > quantity + skip;
 
       const users = await userRepository
@@ -71,7 +72,7 @@ export const resolvers = {
       }
 
       const encryptedPassword = hashEncrypt(args.password);
-      if (user.password != encryptedPassword) {
+      if (user.password !== encryptedPassword) {
         throw new CustomError('Email e/ou senha incorretos!', 401, 'Unauthorized');
       }
 

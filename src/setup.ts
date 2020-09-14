@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 import { formatError } from './errors';
 
 export async function setup() {
-  const isTest: boolean = process.env.TEST == 'true';
+  const isTest: boolean = process.env.TEST === 'true';
   dotenv.config({path: process.cwd() + (isTest ? '/.env.test': '/.env') });
 
   await connectToDatabase();
