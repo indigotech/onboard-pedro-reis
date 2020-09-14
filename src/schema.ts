@@ -1,6 +1,6 @@
 export const typeDefs = `
 type Query {
-  info: String!
+  hello: String!
   user(id: ID!): User!
   users(quantity: Int, skip: Int): UserPagination!
 }

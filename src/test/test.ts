@@ -6,29 +6,42 @@ import { getRepository } from 'typeorm';
 import { hashEncrypt } from '../functions'
 
 const url: string = 'http://localhost';
+console.log('ok');
 
-before(async function() {
-  await setup();
-})
+// before(async function() {
+//   console.log('ok');
+//   await setup();
+// })
 
-describe('Hello', function() {
-  it('should find a "Hello, Taqtiler!"', async function() {
-    const res = await request(url + ':' + process.env.PORT)
-      .post('/')
-      .send({
-        query: 'query { info }'
-      })
-    expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
+// describe('Query: hello', function() {
+//   it('should find a "Hello, Taqtiler!"', async function() {
+//     const res = await request(url + ':' + process.env.PORT)
+//       .post('/')
+//       .send({
+//         query: helloQueryString()
+//       })
+//     expect(res.body.data.info).to.be.eq('Hello, Taqtiler!');
+//   })
+// })
+
+function helloQueryString(): string {
+  const query: string = `
+  query {
+    hello
+  }`
+  return query;
+}
+
+describe('Mutation: login', function() {
+  before(async function() {
+    console.log('ok');
+    await setup();
   })
-})
-
-describe('Mutation login Test', function() {
   const user = new User();
   const defaultPassword = 'joaosilvap1';;
+  const userRepository = getRepository(User);
 
   before(async function() {
-    const userRepository = getRepository(User);
-
     user.name = 'Joao da Silva';
     user.email = 'joao.silva@gmail.com';
     user.birthDate = '28-08-1987';
@@ -39,7 +52,6 @@ describe('Mutation login Test', function() {
   })
 
   after (async function() {
-    const userRepository = getRepository(User);
     await userRepository.clear();
   })
 
@@ -62,7 +74,7 @@ describe('Mutation login Test', function() {
         query: loginMutationString('joao.silvagmail.com', defaultPassword)
       })
     expect(res.body.errors[0].message).to.be.eq('Formato de e-mail incorreto!');
-    expect(res.body.errors[0].code).to.be.eq(401);
+    expect(res.body.errors[0].code).to.be.eq(400);
   })
 
   it('should return no user found', async function() {
@@ -79,7 +91,7 @@ describe('Mutation login Test', function() {
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .send({
-        query: loginMutationString(user.email, 'senhaInvalida')
+        query: loginMutationString(user.email, 'senhaInvalida1')
       })
     expect(res.body.errors[0].message).to.be.eq('Email e/ou senha incorretos!');
     expect(res.body.errors[0].code).to.be.eq(401);

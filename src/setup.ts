@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 import { formatError } from './errors';
 
 export async function setup() {
+  console.log(process.env.TEST);
   const isTest: boolean = process.env.TEST === 'true';
   dotenv.config({path: process.cwd() + (isTest ? '/.env.test': '/.env') });
 
