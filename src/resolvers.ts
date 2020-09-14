@@ -50,7 +50,7 @@ export const resolvers = {
       const userRepository = getRepository(User);
       let user = await userRepository.findOne({ email: args.user.email });
       if (user) {
-        throw new CustomError('Usuário já está cadastrado!', 403, 'email already registered');
+        throw new CustomError('Usuário já está cadastrado!', 409, 'email already registered');
       }
 
       const regExPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$/
