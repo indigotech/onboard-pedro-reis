@@ -13,7 +13,7 @@ export const resolvers = {
     login: async (parent, args, context) => {
       const regExEmail = /\S+@\S+\.\S+/;
       if (!regExEmail.test(args.email)) {
-        throw new CustomError('Formato de e-mail incorreto!', 40, 'Bad Request');
+        throw new CustomError('Formato de e-mail incorreto!', 400, 'Bad Request');
       }
 
       const userRepository = getRepository(User);
