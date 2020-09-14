@@ -28,6 +28,7 @@ type User {
 
 type UserPagination {
   users: [User!]!
+  userCount: Int!
   before: Boolean!
   after: Boolean!
 }

@@ -29,39 +29,28 @@ export const resolvers = {
 
     users: async (parent, args, context) => {
       verifyToken(context.request.headers.authorization);
-      let quantity = 5;
-      if (args.quantity) {
-        quantity = args.quantity;
-      }
 
-      let skip = 0;
-      if (args.skip) {
-        skip = args.skip;
-      }
+      const quantity = args.quantity ?? 5;
 
-      let before: boolean = true;
-      if (skip == 0) {
-        before = false;
-      }
+      const skip = args.skip ?? 0;
+
+      const before = !(skip === 0);
 
       const userRepository = getRepository(User);
 
       const userCount = await userRepository.count();
-      let after: boolean = false;
-      if (userCount > quantity + skip) {
-        after = true;
-      }
+      const after = userCount > quantity + skip;
 
-      const users = await getConnection()
-      .getRepository(User)
-      .createQueryBuilder("user")
-      .orderBy("user.name", "DESC")
-      .take(quantity)
-      .skip(skip)
-      .getMany();
+      const users = await userRepository
+        .createQueryBuilder("user")
+        .orderBy("user.name", "DESC")
+        .take(quantity)
+        .skip(skip)
+        .getMany();
 
       return {
         users,
+        userCount,
         before,
         after
       }
