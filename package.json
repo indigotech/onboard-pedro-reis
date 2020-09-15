@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "function": "ts-node src/functions/functions.ts",
-    "mocha": "TEST=true mocha -r ts-node/register src/test/test.ts",
+    "function": "ts-node src/functions.ts",
+    "mocha": "TEST=true mocha -r ts-node/register src/test/test.ts --exit",
     "test": "TEST=true ts-node src/index.ts",
     "seed": "ts-node src/seed.ts",
     "start": "ts-node src/index.ts"
