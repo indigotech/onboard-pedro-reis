@@ -14,7 +14,7 @@ export class CustomError extends Error {
 export function formatError(error: any) {
   const originalError = error.originalError;
 
-  if(originalError && originalError.name == 'CustomError') {
+  if(originalError && originalError.name === 'CustomError') {
     return {
       ... error,
       message: originalError.message,

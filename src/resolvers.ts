@@ -25,6 +25,36 @@ export const resolvers = {
         birthDate: user.birthDate,
         cpf: user.cpf
       }
+    },
+
+    users: async (parent, args, context) => {
+      verifyToken(context.request.headers.authorization);
+
+      const quantity = args.quantity ?? 5;
+      const skip = args.skip ?? 0;
+      if (quantity < 0 || skip < 0) {
+        throw new CustomError('A quantidade e o offset devem ser positivos', 400, 'bad request');
+      }
+
+      const userRepository = getRepository(User);
+      const userCount = await userRepository.count();
+
+      const before = skip !== 0;
+      const after = userCount > quantity + skip;
+
+      const users = await userRepository
+        .createQueryBuilder("user")
+        .orderBy("user.name", "DESC")
+        .take(quantity)
+        .skip(skip)
+        .getMany();
+
+      return {
+        users,
+        userCount,
+        before,
+        after
+      }
     }
   },
 
@@ -42,7 +72,7 @@ export const resolvers = {
       }
 
       const encryptedPassword = hashEncrypt(args.password);
-      if (user.password != encryptedPassword) {
+      if (user.password !== encryptedPassword) {
         throw new CustomError('Email e/ou senha incorretos!', 401, 'Unauthorized');
       }
 

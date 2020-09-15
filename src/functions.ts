@@ -8,10 +8,7 @@ export function hashEncrypt (noEncrypted: string): string {
 
 export function verifyToken(token: string) {
   try {
-    const decodedToken = jwt.verify(token, 'supersecret');
-    if (!decodedToken.id){
-      throw new Error;
-    }
+    jwt.verify(token, process.env.TOKEN_SECRET);
   } catch(err) {
     throw new CustomError('Usuário não autenticado! Faça seu login!', 401, 'invalid token');
   }
