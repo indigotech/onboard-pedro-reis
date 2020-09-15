@@ -9,7 +9,6 @@ import * as jwt from 'jsonwebtoken';
 import { url } from './test'
 
 describe('Query: users', function() {
-  console.log('ok');
   let token: string;
   let quantityToPopulateDatabse = 20;
   let quantity = 5;
@@ -41,14 +40,12 @@ describe('Query: users', function() {
   })
 
   it('should find users - default input', async function() {
-    console.log(usersQueryString());
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
         query: usersQueryString()
       })
-      console.log(res.body);
       expect(res.body.data.users.users.length).to.be.eq(5);
       expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
 
