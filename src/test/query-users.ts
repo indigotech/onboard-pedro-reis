@@ -11,8 +11,6 @@ import { url } from './test'
 describe('Query: users', function() {
   let token: string;
   let quantityToPopulateDatabse = 20;
-  let quantity = 5;
-  let pageCount = quantityToPopulateDatabse/quantity;
 
   before(async function() {
     let userRepository = getRepository(User);
@@ -40,11 +38,13 @@ describe('Query: users', function() {
   })
 
   it('should find users - default input', async function() {
+    const [query, variables] = usersQueryString();
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
-        query: usersQueryString()
+        query,
+        variables
       })
       expect(res.body.data.users.users.length).to.be.eq(5);
       expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
@@ -53,80 +53,151 @@ describe('Query: users', function() {
       expect(res.body.data.users.after).to.be.eq(5 > quantityToPopulateDatabse ? false : true);
   })
 
-  for (let i = 0; i < pageCount; i++) {
-    it('page ' + (i + 1) + ' - should find users', async function() {
-      const res = await request(url + ':' + process.env.PORT)
-        .post('/')
-        .set('authorization', token)
-        .send({
-          query: usersQueryString(quantity, quantity*i)
-        })
-        expect(res.body.data.users.users.length).to.be.eq(quantity);
-        expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
-
-        expect(res.body.data.users.before).to.be.eq(i === 0 ? false : true);
-        expect(res.body.data.users.after).to.be.eq(i === pageCount - 1 ? false : true);
-    })
-  }
-
-  it('should return an error (quantity negative)', async function() {
+  it('should find users - default skip', async function() {
+    const quantity = 10;
+    const [query, variables] = usersQueryString(quantity);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
-        query: usersQueryString(-1, 5)
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(quantity);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(false);
+      expect(res.body.data.users.after).to.be.eq(true);
+  })
+
+  it('should find users - default quantity', async function() {
+    const skip = 2;
+    const [query, variables] = usersQueryString(undefined, skip);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(5);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(true);
+      expect(res.body.data.users.after).to.be.eq(true);
+  })
+
+  it('should find users - normal entry', async function() {
+    const quantity = 7;
+    const skip = 2;
+    const [query, variables] = usersQueryString(quantity, skip);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(quantity);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(true);
+      expect(res.body.data.users.after).to.be.eq(true);
+  })
+
+  it('should find users - first users', async function() {
+    const quantity = 9;
+    const skip = 0;
+    const [query, variables] = usersQueryString(quantity, skip);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(quantity);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(false);
+      expect(res.body.data.users.after).to.be.eq(true);
+  })
+
+  it('should find users - skip all', async function() {
+    const quantity = 5;
+    const skip = quantityToPopulateDatabse;
+    const [query, variables] = usersQueryString(quantity, skip);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(0);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(true);
+      expect(res.body.data.users.after).to.be.eq(false);
+  })
+
+  it('should find users - quantity > quantityToPopulateDatabase', async function() {
+    const quantity = quantityToPopulateDatabse + 5;
+    const skip = 0;
+    const [query, variables] = usersQueryString(quantity, skip);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
+      })
+      expect(res.body.data.users.users.length).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.userCount).to.be.eq(quantityToPopulateDatabse);
+      expect(res.body.data.users.before).to.be.eq(false);
+      expect(res.body.data.users.after).to.be.eq(false);
+  })
+
+  it('should return an error (quantity negative)', async function() {
+    const [query, variables] = usersQueryString(-1, 5);
+    const res = await request(url + ':' + process.env.PORT)
+      .post('/')
+      .set('authorization', token)
+      .send({
+        query,
+        variables
       })
       expect(res.body.errors[0].message).to.be.eq('A quantidade e o offset devem ser positivos');
       expect(res.body.errors[0].code).to.be.eq(400);
   })
 
   it('should return an error (skip negative)', async function() {
+    const [query, variables] = usersQueryString(5, -1);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
-        query: usersQueryString(5, -1)
+        query,
+        variables
       })
       expect(res.body.errors[0].message).to.be.eq('A quantidade e o offset devem ser positivos');
       expect(res.body.errors[0].code).to.be.eq(400);
   })
 
   it('should return an error (token not valid)', async function() {
+    const [query, variables] = usersQueryString(5, 5);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', 'anything')
       .send({
-        query: usersQueryString(5, 5)
+        query,
+        variables
       })
       expect(res.body.errors[0].message).to.be.eq('Usuário não autenticado! Faça seu login!');
       expect(res.body.errors[0].code).to.be.eq(401);
   })
 })
 
-function usersQueryString(quantity?: number, skip?: number): string {
-  let query: string = `
-  query {
-    users`
-
-  if (quantity !== undefined && skip !== undefined) {
-    query = query + ` (
-      quantity: ${quantity},
-      skip: ${skip}
-    )`
-  } else if (quantity !== undefined) {
-    query = query + ` (
-      quantity: ${quantity}
-    )`
-  } else if (skip !== undefined) {
-    query = query + ` (
-      skip: ${skip}
-    )`
-  } else {
-    query = query + `
-    `
-  }
-
-  query = query + `
+function usersQueryString(quantity?: number, skip?: number): [string, object] {
+  const query: string = `
+  query users($quantity: Int, $skip: Int)
+  {
+    users(quantity: $quantity, skip: $skip)
     {
       users {
         id
@@ -136,5 +207,7 @@ function usersQueryString(quantity?: number, skip?: number): string {
       after
     }
   }`
-  return query;
+
+  const variables: object = {quantity, skip};
+  return [query, variables];
 }

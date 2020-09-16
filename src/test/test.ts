@@ -11,7 +11,6 @@ before(async function() {
   await setup();
 })
 
-require('./query-hello');
 require('./query-user');
 require('./query-users');
 

@@ -32,12 +32,15 @@ describe('Query: user', function() {
   })
 
   it('should find an user', async function() {
+    const [query, variables] = userQueryString(user.id);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
-        query: userQueryString(user.id)
+        query,
+        variables
       })
+      expect(res.body.data.user.id).to.be.eq(user.id.toString());
       expect(res.body.data.user.name).to.be.eq(user.name);
       expect(res.body.data.user.email).to.be.eq(user.email);
       expect(res.body.data.user.birthDate).to.be.eq(user.birthDate);
@@ -45,34 +48,37 @@ describe('Query: user', function() {
   })
 
   it('should not find an user', async function() {
+    const [query, variables] = userQueryString(-2);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', token)
       .send({
-        query: userQueryString(-2)
+        query,
+        variables
       })
       expect(res.body.errors[0].message).to.be.eq('Usuário não encontrado!');
       expect(res.body.errors[0].code).to.be.eq(404);
   })
 
   it('should return an error (token not valid)', async function() {
+    const [query, variables] = userQueryString(3);
     const res = await request(url + ':' + process.env.PORT)
       .post('/')
       .set('authorization', 'anything')
       .send({
-        query: userQueryString(3)
+        query,
+        variables
       })
       expect(res.body.errors[0].message).to.be.eq('Usuário não autenticado! Faça seu login!');
       expect(res.body.errors[0].code).to.be.eq(401);
   })
 })
 
-function userQueryString(id: number): string {
+function userQueryString(id: number): [string, object] {
   const query: string = `
-  query {
-    user (
-      id: ${id}
-    )
+  query user($id: ID!)
+  {
+    user(id: $id)
     {
       id
       name
@@ -81,5 +87,7 @@ function userQueryString(id: number): string {
       cpf
     }
   }`
-  return query;
+
+  const variables: object = {id}
+  return [query, variables];
 }
