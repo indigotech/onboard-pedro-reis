@@ -6,8 +6,6 @@ import { hashEncrypt, verifyToken } from './functions';
 
 export const resolvers = {
   Query: {
-    info: () => 'Hello, Taqtiler!',
-
     user: async (parent, args, context) => {
       verifyToken(context.request.headers.authorization);
 

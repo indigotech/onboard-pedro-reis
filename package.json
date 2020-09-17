@@ -4,11 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "function": "ts-node src/functions/functions.ts",
-    "mocha": "TEST=true mocha -r ts-node/register src/test/test.ts",
-    "test": "TEST=true ts-node src/index.ts",
     "seed": "ts-node src/seed.ts",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "test": "TEST=true mocha -r ts-node/register src/test/test.ts --exit"
   },
   "keywords": [],
   "author": "",

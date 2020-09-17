@@ -4,14 +4,14 @@ import { User } from './entity/User';
 import { hashEncrypt } from './functions';
 import { setup } from './setup';
 
-populateDataBase();
+populateDataBase(50);
 
-async function populateDataBase() {
+async function populateDataBase(quantity: number) {
   await setup();
   let userRepository = getRepository(User);
   let users = [];
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < quantity; i++) {
     const user = new User();
     user.name = faker.name.findName();
     user.email = faker.internet.email();
@@ -23,4 +23,3 @@ async function populateDataBase() {
   }
   await userRepository.save(users);
 }
-
